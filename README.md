@@ -44,3 +44,4 @@ DbaTools Studio is a cross-platform desktop application built with .NET 8 and Av
 * **C# / .NET 8** - Core framework
 * **Avalonia UI** - Cross-platform UI framework
 * **System.Management.Automation** - PowerShell SDK integration
+
