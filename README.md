@@ -47,3 +47,11 @@ DbaTools Studio is a cross-platform desktop application built with .NET 8 and Av
 * **Avalonia UI** - Cross-platform UI framework
 * **System.Management.Automation** - PowerShell SDK integration
 
+## Acknowledgments / Credits
+
+This project is an independent graphical user interface (GUI) built on top of the incredible **[dbatools](https://github.com/dataplat/dbatools)** PowerShell module. 
+
+A massive thank you to the [dataplat](https://github.com/dataplat) team and all the contributors of `dbatools` for creating the ultimate SQL Server automation toolkit. The UI design and structure of this application are heavily inspired by the official [dbatools.io](https://dbatools.io/) website.
+
+*This project is not officially affiliated with the dbatools team.*
+
