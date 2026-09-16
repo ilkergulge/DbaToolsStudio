@@ -1,5 +1,7 @@
 # DbaTools Studio
 
+![DbaTools Studio UI](dbatoolsStudio_1.png)
+
 DbaTools Studio is a cross-platform desktop application built with .NET 8 and Avalonia UI that provides a beautiful, modern graphical interface for [dbatools](https://dbatools.io/). It eliminates the need to remember complex PowerShell commands by offering an interactive way to explore, configure, and execute over 700 SQL Server automation commands.
 
 ## Features
