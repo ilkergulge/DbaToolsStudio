@@ -1,0 +1,173 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="800"
+        x:Class="DbaToolsStudio.MainWindow"
+        Title="DbaTools Studio - Commands Browser"
+        Background="#F9FAFB">
+
+    <Window.Styles>
+        <Style Selector="ListBox.CategoryList">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+        </Style>
+        <Style Selector="ListBox.CategoryList ListBoxItem">
+            <Setter Property="Padding" Value="10,8"/>
+            <Setter Property="Margin" Value="0,2"/>
+            <Setter Property="CornerRadius" Value="6"/>
+        </Style>
+        <Style Selector="ListBox.CategoryList ListBoxItem:selected">
+            <Setter Property="Background" Value="#E0F2FE"/>
+            <Setter Property="Foreground" Value="#0284C7"/>
+        </Style>
+    </Window.Styles>
+
+    <Grid ColumnDefinitions="250, *" RowDefinitions="*, Auto">
+        
+        <!-- Left Sidebar: Categories -->
+        <Border Grid.Column="0" Grid.Row="0" Background="White" BorderBrush="#E5E7EB" BorderThickness="0,0,1,0" Padding="15">
+            <Grid RowDefinitions="Auto, *">
+                <TextBlock Text="CATEGORIES" FontWeight="Bold" FontSize="12" Foreground="#6B7280" Margin="5,0,0,10"/>
+                
+                <ListBox x:Name="CategoriesListBox" Grid.Row="1" Classes="CategoryList" SelectionChanged="CategoriesListBox_SelectionChanged">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate>
+                            <Grid ColumnDefinitions="*, Auto">
+                                <TextBlock Grid.Column="0" Text="{Binding Name}" FontWeight="Medium" VerticalAlignment="Center"/>
+                                <Border Grid.Column="1" Background="#F3F4F6" CornerRadius="10" Padding="8,2">
+                                    <TextBlock Text="{Binding Count}" FontSize="12" Foreground="#4B5563"/>
+                                </Border>
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </Grid>
+        </Border>
+
+        <!-- Right Content Area -->
+        <Grid Grid.Column="1" Grid.Row="0">
+            
+            <!-- VIEW 1: COMMANDS GRID -->
+            <Grid x:Name="CommandsViewPanel" RowDefinitions="Auto, *" Margin="25">
+                <Grid Grid.Row="0" ColumnDefinitions="Auto, *, Auto" Margin="0,0,0,20">
+                    <TextBlock x:Name="CommandsCountText" Grid.Column="0" FontSize="18" FontWeight="SemiBold" Foreground="#374151" VerticalAlignment="Center"/>
+                    <TextBox x:Name="SearchBox" Grid.Column="2" Width="300" Watermark="Search commands..." 
+                             TextChanged="SearchBox_TextChanged" CornerRadius="6" VerticalAlignment="Center"/>
+                </Grid>
+
+                <ScrollViewer Grid.Row="1" HorizontalScrollBarVisibility="Disabled">
+                    <ItemsControl x:Name="CommandsItemsControl">
+                        <ItemsControl.ItemsPanel>
+                            <ItemsPanelTemplate>
+                                <WrapPanel Margin="0" />
+                            </ItemsPanelTemplate>
+                        </ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" 
+                                        Width="380" Height="150" Margin="0,0,20,20" Padding="20">
+                                    <Border.Styles>
+                                        <Style Selector="Border">
+                                            <Setter Property="Transitions">
+                                                <Transitions>
+                                                    <ThicknessTransition Property="Margin" Duration="0:0:0.2"/>
+                                                    <BoxShadowsTransition Property="BoxShadow" Duration="0:0:0.2"/>
+                                                </Transitions>
+                                            </Setter>
+                                            <Setter Property="BoxShadow" Value="0 1 3 0 #19000000"/>
+                                        </Style>
+                                        <Style Selector="Border:pointerover">
+                                            <Setter Property="Margin" Value="0,-2,20,22"/>
+                                            <Setter Property="BoxShadow" Value="0 10 15 -3 #19000000"/>
+                                            <Setter Property="Cursor" Value="Hand"/>
+                                        </Style>
+                                    </Border.Styles>
+                                    <Grid RowDefinitions="Auto, *, Auto" Background="Transparent" PointerPressed="CommandCard_PointerPressed">
+                                        <Grid Grid.Row="0" ColumnDefinitions="*, Auto">
+                                            <TextBlock Grid.Column="0" Text="{Binding Name}" FontSize="18" FontWeight="Bold" Foreground="#10B981" TextTrimming="CharacterEllipsis"/>
+                                            <TextBlock Grid.Column="1" Text="⭐" IsVisible="{Binding IsPopular}" FontSize="16"/>
+                                        </Grid>
+                                        <TextBlock Grid.Row="1" Text="{Binding Description}" FontSize="14" Foreground="#6B7280" 
+                                                   TextWrapping="Wrap" TextTrimming="CharacterEllipsis" Margin="0,10,0,0"/>
+                                        <TextBlock Grid.Row="2" Text="{Binding Category, StringFormat='Category: {0}'}" 
+                                                   FontSize="12" FontWeight="SemiBold" Foreground="#9CA3AF" />
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </Grid>
+
+            <!-- VIEW 2: COMMAND DETAIL & EXECUTION -->
+            <Grid x:Name="DetailViewPanel" IsVisible="False" RowDefinitions="Auto, *, Auto" Margin="25">
+                
+                <StackPanel Grid.Row="0" Spacing="15" Margin="0,0,0,20">
+                    <Button Content="← Back to Commands" Background="Transparent" Foreground="#4F46E5" FontWeight="SemiBold" Click="BackButton_Click"/>
+                    
+                    <Border Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Padding="20">
+                        <StackPanel Spacing="10">
+                            <TextBlock x:Name="DetailTitleText" FontSize="24" FontWeight="Bold" Foreground="#10B981"/>
+                            <TextBlock x:Name="DetailDescText" FontSize="15" Foreground="#4B5563" TextWrapping="Wrap"/>
+                            
+                            <Expander Header="Show Examples" Margin="0,10,0,0">
+                                <SelectableTextBlock x:Name="DetailExamplesText" FontFamily="Consolas" FontSize="13" Foreground="#374151" TextWrapping="Wrap"/>
+                            </Expander>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <Grid Grid.Row="1" ColumnDefinitions="480, 20, *">
+                    <!-- Form -->
+                    <Border Grid.Column="0" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Padding="20">
+                        <Grid RowDefinitions="*, Auto, Auto">
+                            <ScrollViewer Grid.Row="0" Padding="0,0,10,0">
+                                <StackPanel x:Name="ParametersPanel" Spacing="15"/>
+                            </ScrollViewer>
+                            
+                            <!-- Command Preview -->
+                            <Border Grid.Row="1" Background="#1E293B" CornerRadius="6" Padding="10" Margin="0,15,0,15">
+                                <TextBlock x:Name="CommandPreviewText" FontFamily="Consolas" FontSize="13" Foreground="#38BDF8" TextWrapping="Wrap" Text="Get-DbaDatabase"/>
+                            </Border>
+
+                            <Grid Grid.Row="2" ColumnDefinitions="*, 10, *">
+                                <Button x:Name="CancelButton" Grid.Column="0" Content="Stop" 
+                                        Background="#EF4444" Foreground="White" FontWeight="Bold" Padding="15,10"
+                                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                        Click="CancelButton_Click" IsEnabled="False"/>
+                                
+                                <Button x:Name="ExecuteButton" Grid.Column="2" Content="Execute" 
+                                        Background="#3B82F6" Foreground="White" FontWeight="Bold" Padding="15,10"
+                                        HorizontalAlignment="Stretch" HorizontalContentAlignment="Center"
+                                        Click="ExecuteButton_Click"/>
+                            </Grid>
+                        </Grid>
+                    </Border>
+                    
+                    <!-- Results -->
+                    <Border Grid.Column="2" Background="White" BorderBrush="#E5E7EB" BorderThickness="1" CornerRadius="8" Padding="20">
+                        <Grid RowDefinitions="Auto, *">
+                            <TextBox x:Name="ResultsSearchBox" Grid.Row="0" Watermark="Search in results..." Margin="0,0,0,10" 
+                                     TextChanged="ResultsSearchBox_TextChanged" IsEnabled="False"/>
+                            <DataGrid x:Name="ResultsDataGrid" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" 
+                                      CanUserReorderColumns="True" CanUserResizeColumns="True" CanUserSortColumns="True"
+                                      GridLinesVisibility="All" BorderThickness="1" BorderBrush="#E5E7EB"/>
+                        </Grid>
+                    </Border>
+                </Grid>
+            </Grid>
+
+        </Grid>
+
+        <!-- Status Bar -->
+        <Border Grid.Row="1" Grid.ColumnSpan="2" Background="#1F2937" Padding="10,5">
+            <Grid ColumnDefinitions="*, Auto">
+                <TextBlock x:Name="StatusText" Grid.Column="0" Text="Ready" Foreground="White" VerticalAlignment="Center" FontSize="13"/>
+                <ProgressBar x:Name="StatusBarProgress" Grid.Column="1" IsIndeterminate="True" Width="150" 
+                             Height="10" IsVisible="False" VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+    </Grid>
+</Window>
